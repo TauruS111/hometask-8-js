@@ -1,27 +1,73 @@
-// Завдання 3 - форма зворотного зв'язку
-// HTML містить розмітку форми. Напиши скрипт, який буде зберігати значення полів у локальне сховище, 
-//коли користувач щось друкує.
+// import throttle from 'lodash.throttle';
 
-// <form class="feedback-form" autocomplete="off">
-//   <label>
-//     Email
-//     <input type="email" name="email" autofocus />
-//   </label>
-//   <label>
-//     Message
-//     <textarea name="message" rows="8"></textarea>
-//   </label>
-//   <button type="submit">Submit</button>
-// </form>
+// const form = document.querySelector('.feedback-form');
+// const emailInput = form.querySelector('input[name="email"]');
+// const messageInput = form.querySelector('textarea[name="message"]');
 
-// Виконуй це завдання у файлах 03-feedback.html і 03-feedback.js. Розбий його на декілька підзавдань:
+// function saveToLocalStorage() {
+//   const data = {
+//     email: emailInput.value,
+//     message: messageInput.value,
+//   };
+//   localStorage.setItem('feedback-form-state', JSON.stringify(data));
+// }
 
-// Відстежуй на формі подію input, і щоразу записуй у локальне сховище об'єкт з полями email і message,
-//  у яких зберігай поточні значення полів форми.
-//  Нехай ключем для сховища буде рядок "feedback-form-state".
-// Під час завантаження сторінки перевіряй стан сховища, і якщо там є збережені дані, заповнюй ними поля форми.
-//  В іншому випадку поля повинні бути порожніми.
-// Під час сабміту форми очищуй сховище і поля форми, а також виводь у консоль об'єкт з полями email,
-//  message та їхніми поточними значеннями.
-// Зроби так, щоб сховище оновлювалось не частіше, ніж раз на 500 мілісекунд.
-//  Для цього додай до проекту і використовуй бібліотеку lodash.throttle.
+// const throttledSaveToLocalStorage = _.throttle(saveToLocalStorage, 500);
+
+// emailInput.addEventListener('input', throttledSaveToLocalStorage);
+// messageInput.addEventListener('input', throttledSaveToLocalStorage);
+
+// const savedData = JSON.parse(localStorage.getItem('feedback-form-state'));
+// if (savedData) {
+//   emailInput.value = savedData.email;
+//   messageInput.value = savedData.message;
+// }
+
+// form.addEventListener('submit', function(event) {
+//   event.preventDefault(); 
+
+//   console.log({
+//     email: emailInput.value,
+//     message: messageInput.value,
+//   });
+
+//   localStorage.removeItem('feedback-form-state');
+//   emailInput.value = '';
+//   messageInput.value = '';
+// });
+
+import throttle from 'lodash.throttle';
+
+const form = document.querySelector('.feedback-form');
+const inputEmail = form.elements.email;
+const inputMessage = form.elements.message;
+
+let formData = {};
+
+initForm();
+
+form.addEventListener('input', throttle(onFormInput, 500));
+form.addEventListener('submit', onFormSubmit);
+
+function onFormInput(e) {
+  formData[e.target.name] = e.target.value;
+  localStorage.setItem('feedback-form-state', JSON.stringify(formData));
+}
+
+function onFormSubmit(e) {
+  e.preventDefault();
+  console.log(formData);
+  form.reset();
+  localStorage.removeItem('feedback-form-state');
+}
+
+function initForm() {
+  let savedData = localStorage.getItem('feedback-form-state');
+  
+  if (savedData) {
+    savedData = JSON.parse(savedData);
+    inputEmail.value = savedData.email || '';
+    inputMessage.value = savedData.message || '';
+    formData = savedData;
+  }
+}

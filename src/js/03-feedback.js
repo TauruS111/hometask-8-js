@@ -18,14 +18,18 @@ function onFormInput(e) {
 
 function onFormSubmit(e) {
   e.preventDefault();
+  
   if (!formData.email || !formData.message) {
     alert("Усі поля мають бути заповнені!");
     return;
   }
-   console.log(formData);
+  
+  console.log(formData);
+  formData = {};
   form.reset();
   localStorage.removeItem('feedback-form-state');
 }
+
 
 function initForm() {
   let savedData = localStorage.getItem('feedback-form-state');
@@ -35,5 +39,6 @@ function initForm() {
     inputEmail.value = savedData.email || '';
     inputMessage.value = savedData.message || '';
     formData = savedData;
+    
   }
 }

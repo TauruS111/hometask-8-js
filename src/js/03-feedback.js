@@ -18,7 +18,11 @@ function onFormInput(e) {
 
 function onFormSubmit(e) {
   e.preventDefault();
-  console.log(formData);
+  if (!formData.email || !formData.message) {
+    alert("Усі поля мають бути заповнені!");
+    return;
+  }
+   console.log(formData);
   form.reset();
   localStorage.removeItem('feedback-form-state');
 }
